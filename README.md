@@ -91,7 +91,7 @@ The system identifies **4 distinct student personas** through K-Means clustering
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    FRONTEND (React + TypeScript)            │
+│                FRONTEND (React + TypeScript)                │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │        Dashboard, Clusters, Students, Reports        │   │
 │  │  Warnings, Fairness Audit, Chat Interface            │   │
