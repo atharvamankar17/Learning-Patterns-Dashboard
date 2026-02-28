@@ -18,13 +18,12 @@ The integration of Google Gemini enables educators to query their data conversat
 1. [Key Features](#key-features)
 2. [System Architecture](#system-architecture)
 3. [Data Pipeline](#data-pipeline)
-4. [Machine Learning Models](#machine-learning-models)
+4. [Machine Learning Models and Benchmarking](#Machine-Learning-Models-and-Benchmarking)
 5. [Frontend Interface](#frontend-interface)
 6. [Technology Stack](#technology-stack)
 7. [Installation & Setup](#installation--setup)
 8. [Usage Guide](#usage-guide)
 9. [API Endpoints](#api-endpoints)
-10. [Model Benchmarking](#model-benchmarking)
 
 ---
 
@@ -266,7 +265,7 @@ optimised_final_dataset.csv
 
 ---
 
-## Machine Learning Models
+## Machine Learning Models and Benchmarking
 
 ### 1. Huber Regression for Score Prediction (`ML.py`)
 
@@ -905,65 +904,6 @@ POST /api/gemini/chat
 Body: {"message": "user question"}
 Response: {"reply": "AI-generated response"}
 ```
-
----
-
-## Model Benchmarking
-
-### Linear Regression Comparison (`Benchmarking/linear_regression_benchmarking.py`)
-
-The system evaluates multiple linear models to ensure **Huber Regressor** is optimal:
-
-#### Models Compared
-1. **Standard Linear (OLS)**: Ordinary Least Squares
-2. **Ridge (L2)**: L2 regularization for stability
-3. **Lasso (L1)**: Sparse feature selection
-4. **ElasticNet (L1+L2)**: Balanced regularization
-5. **Huber (Robust)**: Outlier-resistant regression
-
-#### Evaluation Methodology
-- **Cross-Validation**: 5-Fold stratified split
-- **Train/Test**: 80/20 ratio per fold
-- **Metrics**:
-  - **R² Score**: Proportion of variance explained (0-1, higher=better)
-  - **RMSE**: Root mean squared error in points (lower=better)
-  - **MAE**: Mean absolute error in points (lower=better)
-
-#### Typical Benchmark Results
-```
-Model                R² Score    RMSE      MAE
-Huber (Robust)       0.745       8.32      6.21
-Ridge (L2)           0.738       8.51      6.45
-ElasticNet           0.735       8.67      6.58
-Lasso (L1)           0.720       9.12      6.89
-Standard Linear      0.698       9.87      7.34
-```
-
-#### Why Huber Wins
-- **Robustness**: Handles outlier exam scores gracefully
-- **Generalization**: Validates well on unseen data
-- **Interpretability**: Simple coefficient interpretation
-- **Practical**: Fast inference for real-time predictions
-
-**Run Benchmark**:
-```bash
-cd backend/Benchmarking
-python linear_regression_benchmarking.py
-```
-
----
-
-## Model Performance & Insights
-
-### Huber Regression Performance
-- **Average R²**: ~0.74 (explains 74% of score variance)
-- **Average RMSE**: ~8.3 points (typical error range)
-- **Average MAE**: ~6.2 points (average deviation)
-
-### K-Means Clustering Quality
-- **Silhouette Score**: ~0.58 (good cluster separation)
-- **Inertia**: Minimized through k-means++ initialization
-- **Interpretability**: All 4 personas clearly distinct
 
 ---
 
