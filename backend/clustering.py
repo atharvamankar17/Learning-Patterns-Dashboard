@@ -116,21 +116,76 @@ def get_recommendation(persona_name):
     return recs.get(persona_name, "Monitor closely.")
 
 def get_filtered_dfs(class_name=None):
-    if not class_name or class_name.lower() in ["school", "all classes", ""]:
-        return df_cluster, df_raw
-    f_cluster = df_cluster[df_cluster["Class_Section"] == class_name]
-    f_raw = df_raw[df_raw["Class_Section"] == class_name] if df_raw is not None else None
-    return f_cluster, f_raw
+    # If no class is specified or class is 'School' (all classes view), return full data
+    if not class_name or str(class_name).lower() in ["school", "all classes", ""]:
+        return df_cluster.copy(), df_raw.copy() if df_raw is not None else None
+    
+    # Filter to specific class
+    filtered_cluster = df_cluster[df_cluster["Class_Section"] == class_name].copy()
+    filtered_raw = df_raw[df_raw["Class_Section"] == class_name].copy() if df_raw is not None else None
+    return filtered_cluster, filtered_raw
 
 def get_cluster_summary(class_name=None):
     f_cluster, _ = get_filtered_dfs(class_name)
     counts = f_cluster["Persona_Cluster"].value_counts().to_dict()
     avgs = f_cluster.groupby("Persona_Cluster")["Exam_Score"].mean().round(1).to_dict()
     
-    return [{
-        "id": name, "name": name, "count": count, 
-        "avgScore": avgs.get(name, 0), "recommendation": get_recommendation(name)
-    } for name, count in counts.items()]
+    # Calculate additional metrics per cluster
+    cluster_metrics = []
+    overall_avg_score = f_cluster["Exam_Score"].mean()
+    
+    for name, count in counts.items():
+        cluster_data = f_cluster[f_cluster["Persona_Cluster"] == name]
+        avg_score = avgs.get(name, 0)
+        
+        # Engagement and burnout metrics
+        avg_engagement = round(cluster_data["Engagement_Index"].mean(), 1)
+        avg_burnout = round(cluster_data["Burnout_Risk"].mean(), 1)
+        
+        # Motivation levels
+        motivation_dist = cluster_data["Motivation_Level"].value_counts().to_dict()
+        high_motivation = motivation_dist.get("High", 0)
+        
+        # At-risk students within cluster
+        at_risk_count = len(cluster_data[cluster_data["Persona_Cluster"].isin(["The Disengaged Learner", "The Overworked Achiever"])])
+        
+        # Performance distribution
+        high_performers = len(cluster_data[cluster_data["Exam_Score"] >= 80])
+        low_performers = len(cluster_data[cluster_data["Exam_Score"] < 60])
+        
+        # Resource dependency
+        avg_resource_dependency = round(cluster_data["Resource_Dependency_Metric"].mean(), 1)
+        
+        # Performance relative to overall average
+        perf_vs_average = round(((avg_score - overall_avg_score) / overall_avg_score * 100) if overall_avg_score > 0 else 0, 1)
+        
+        # Determine cluster health status
+        if name == "The Disengaged Learner":
+            health_status = "Critical"
+        elif name == "The Overworked Achiever":
+            health_status = "At Risk"
+        else:
+            health_status = "Healthy"
+        
+        cluster_metrics.append({
+            "id": name,
+            "name": name,
+            "count": count,
+            "percentage": round((count / len(f_cluster) * 100), 1),
+            "avgScore": avg_score,
+            "scoreVsAverage": perf_vs_average,
+            "avgEngagement": avg_engagement,
+            "avgBurnout": avg_burnout,
+            "highMotivation": high_motivation,
+            "atRiskCount": at_risk_count,
+            "highPerformers": high_performers,
+            "lowPerformers": low_performers,
+            "avgResourceDependency": avg_resource_dependency,
+            "healthStatus": health_status,
+            "recommendation": get_recommendation(name)
+        })
+    
+    return cluster_metrics
 
 def get_all_students(class_name=None):
     students = []
@@ -244,14 +299,41 @@ def get_mock_timeline(student_data):
 def compute_fairness(class_name=None):
     f_cluster, _ = get_filtered_dfs(class_name)
     
-    def disparate_impact(attribute, unprivileged, privileged):
-        if attribute not in f_cluster.columns: return {"ratio": 1.0, "flag": "Missing column"}
-        unpriv_group, priv_group = f_cluster[f_cluster[attribute] == unprivileged], f_cluster[f_cluster[attribute] == privileged]
-        if len(unpriv_group) == 0 or len(priv_group) == 0: return {"ratio": 1.0, "flag": "Insufficient data"}
+    def disparate_impact(attribute, unprivileged, privileged, metric_name="outcome"):
+        if attribute not in f_cluster.columns: 
+            return {"ratio": 1.0, "flag": "Missing column", "unprivRate": 0, "privRate": 0, "sample_unpriv": 0, "sample_priv": 0}
+        
+        unpriv_group = f_cluster[f_cluster[attribute] == unprivileged]
+        priv_group = f_cluster[f_cluster[attribute] == privileged]
+        
+        if len(unpriv_group) == 0 or len(priv_group) == 0: 
+            return {"ratio": 1.0, "flag": "Insufficient data", "unprivRate": 0, "privRate": 0, "sample_unpriv": len(unpriv_group), "sample_priv": len(priv_group)}
+        
         unfavorable = ["The Disengaged Learner", "The Overworked Achiever"]
         unpriv_rate = len(unpriv_group[unpriv_group["Persona_Cluster"].isin(unfavorable)]) / len(unpriv_group)
         priv_rate = len(priv_group[priv_group["Persona_Cluster"].isin(unfavorable)]) / len(priv_group)
         ratio = unpriv_rate / priv_rate if priv_rate > 0 else 0
-        return {"ratio": round(ratio, 2), "flag": "Potential bias" if ratio < 0.8 or ratio > 1.25 else "Acceptable"}
         
-    return {"gender": disparate_impact("Gender", "Female", "Male"), "income": disparate_impact("Family_Income", "Low", "High")}
+        flag = "Potential bias" if ratio < 0.8 or ratio > 1.25 else "Acceptable"
+        
+        return {
+            "ratio": round(ratio, 3), 
+            "flag": flag,
+            "unprivRate": round(unpriv_rate, 3),
+            "privRate": round(priv_rate, 3),
+            "sample_unpriv": len(unpriv_group),
+            "sample_priv": len(priv_group)
+        }
+        
+    fairness_results = {
+        "gender": disparate_impact("Gender", "Female", "Male", "Gender"),
+        "income": disparate_impact("Family_Income", "Low", "High", "Family Income"),
+        "parental_education": disparate_impact("Parental_Education_Level", "High School", "Postgraduate", "Parental Education"),
+        "learning_disabilities": disparate_impact("Learning_Disabilities", "Yes", "No", "Learning Disability Status"),
+        "school_type": disparate_impact("School_Type", "Public", "Private", "School Type"),
+        "internet_access": disparate_impact("Internet_Access", "No", "Yes", "Internet Access"),
+        "parental_involvement": disparate_impact("Parental_Involvement", "Low", "High", "Parental Involvement"),
+        "distance_from_home": disparate_impact("Distance_from_Home", "Far", "Near", "Distance from Home")
+    }
+    
+    return fairness_results

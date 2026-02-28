@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line, RadialBarChart, RadialBar } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -93,6 +93,88 @@ export function ChartSkeleton() {
       </CardHeader>
       <CardContent>
         <Skeleton className="h-[260px] w-full rounded-md" />
+      </CardContent>
+    </Card>
+  );
+}
+
+interface ScoreDistributionProps {
+  data: { name: string; avgScore: number; count: number }[];
+}
+
+export function ScoreDistributionChart({ data }: ScoreDistributionProps) {
+  return (
+    <Card className="shadow-sm animate-fade-in">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">Cluster Performance Comparison</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height={260}>
+          <BarChart data={data} margin={{ left: 40, right: 20, top: 5, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+            <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <YAxis domain={[0, 100]} tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "hsl(var(--card))",
+                border: "1px solid hsl(var(--border))",
+                borderRadius: "var(--radius)",
+                fontSize: "12px",
+              }}
+              formatter={(value: any) => [`${Number(value).toFixed(1)}/100`, "Avg Score"]}
+            />
+            <Bar dataKey="avgScore" radius={[4, 4, 0, 0]} fill="hsl(224, 76%, 48%)" />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+interface PerformanceGaugeProps {
+  percentage: number;
+}
+
+export function PerformanceGaugeChart({ percentage }: PerformanceGaugeProps) {
+  const gaugeData = [{ name: "Performance", value: Math.min(percentage, 100), fill: "hsl(224, 76%, 48%)" }];
+  
+  return (
+    <Card className="shadow-sm animate-fade-in">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-medium text-muted-foreground">Overall Class Performance</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col items-center justify-center h-[260px]">
+          <ResponsiveContainer width="100%" height={160}>
+            <RadialBarChart
+              cx="50%"
+              cy="50%"
+              innerRadius="60%"
+              outerRadius="90%"
+              data={gaugeData}
+              startAngle={180}
+              endAngle={0}
+            >
+              <RadialBar
+                background={{ fill: "hsl(var(--muted))" }}
+                dataKey="value"
+                cornerRadius={4}
+                label={false}
+              />
+            </RadialBarChart>
+          </ResponsiveContainer>
+          <div className="text-center mt-2">
+            <div className="text-3xl font-bold text-foreground">{Number(percentage).toFixed(1)}</div>
+            <div className="text-xs text-muted-foreground">out of 100</div>
+            <div className={`text-xs font-semibold mt-1 ${
+              percentage >= 80 ? "text-green-600" :
+              percentage >= 70 ? "text-amber-600" :
+              "text-red-600"
+            }`}>
+              {percentage >= 80 ? "Excellent" : percentage >= 70 ? "Good" : "Needs Improvement"}
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

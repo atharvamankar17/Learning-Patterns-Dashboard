@@ -3,7 +3,7 @@ import { api, uploadCSV } from "@/lib/api";
 import { toast } from "sonner";
 import { getIndianName } from "@/lib/nameGenerator";
 
-const defaultOptions = { staleTime: 300000, retry: 2 };
+const defaultOptions = { staleTime: 0, retry: 2 };
 
 export function useSummaryReport(className?: string) {
   return useQuery<any>({ queryKey: ["summary-report", className], queryFn: () => api.getSummaryReport(className), ...defaultOptions });
