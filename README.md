@@ -25,7 +25,6 @@ The integration of Google Gemini enables educators to query their data conversat
 8. [Usage Guide](#usage-guide)
 9. [API Endpoints](#api-endpoints)
 10. [Model Benchmarking](#model-benchmarking)
-11. [Contributing](#contributing)
 
 ---
 
