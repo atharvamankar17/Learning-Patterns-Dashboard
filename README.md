@@ -1,14 +1,19 @@
-# Learning Patterns Dashboard 📚
+# Learning Patterns Dashboard
 
 ## Overview
 
 The **Learning Patterns Dashboard** is an advanced educational analytics platform that combines machine learning, data science, and modern web technologies to provide educators and institutions with deep insights into student learning patterns, performance predictions, and early intervention opportunities.
 
-This system utilizes **K-Means clustering** to identify distinct student personas and **Huber Regression** for robust score prediction, enabling data-driven decision-making in educational settings.
+This system utilizes:
+- **K-Means Clustering** to identify distinct student personas
+- **Huber Regression** for robust score prediction
+- **Google Gemini AI** for intelligent data interpretation, conversational insights, and AI-powered recommendations
+
+The integration of Google Gemini enables educators to query their data conversationally, receive contextual insights about student performance patterns, and get AI-generated recommendations for interventions—all through an intuitive chat interface. This feature transforms raw data analysis into actionable pedagogical guidance.
 
 ---
 
-## 📋 Table of Contents
+## Table of Contents
 
 1. [Key Features](#key-features)
 2. [System Architecture](#system-architecture)
@@ -26,13 +31,13 @@ This system utilizes **K-Means clustering** to identify distinct student persona
 
 ## Key Features
 
-### 🎯 Dashboard Insights
+### Dashboard Insights
 - **Real-time Analytics**: Comprehensive view of class performance, student demographics, and learning metrics
 - **CSV Data Upload**: Upload new student datasets to continuously train and improve models
 - **Performance Metrics**: Track exam scores, attendance rates, study hours, sleep patterns, and physical activity
 - **Statistical Summary**: Aggregated class statistics including mean, median, and distributions
 
-### 👥 Student Clustering & Personas
+### Student Clustering & Personas
 The system identifies **4 distinct student personas** through K-Means clustering:
 
 1. **The Overworked Achiever** 
@@ -55,26 +60,26 @@ The system identifies **4 distinct student personas** through K-Means clustering
    - Risk Profile: At academic risk, requires intervention
    - Intervention: Motivation programs, one-on-one support
 
-### 🚨 Early Warning System
+### Early Warning System
 - **At-Risk Detection**: Identifies students likely to underperform using predictive analytics
 - **Risk Indicators**: Analyzes burnout risk, engagement levels, and performance trends
 - **Fairness Audits**: Detects potential biases across demographic groups and learning characteristics
 - **Intervention Recommendations**: Suggests targeted support strategies
 
-### 📊 Predictive Analytics
+### Predictive Analytics
 - **Score Prediction**: Estimates exam scores based on current learning patterns
 - **What-If Analysis**: Simulate performance impact of changing study habits, sleep patterns, or tutoring sessions
 - **Feature Importance**: Understand which factors most strongly influence academic performance
 - **Persona Assignment**: Automatically classifies new students into appropriate learning personas
 
-### 📈 Data Visualization
+### Data Visualization
 - Cluster distribution pie charts
 - Feature importance bar charts
 - Statistical comparisons across student groups
 - Trend analysis and performance trajectories
 - Fairness metrics visualization
 
-### 🔧 Advanced Capabilities
+### Advanced Capabilities
 - **AI Chat Interface**: Integrated Gemini-powered chatbot for data interpretation and insights (via `gemini_service`)
 - **PDF Report Generation**: Export comprehensive academic reports
 - **Class-wise Analysis**: Filter and compare data across different class sections
@@ -129,7 +134,7 @@ The system identifies **4 distinct student personas** through K-Means clustering
 
 ## Data Pipeline
 
-### 🔄 Multi-Stage Data Processing Flow
+### Multi-Stage Data Processing Flow
 
 The system employs a sophisticated **5-stage data preparation pipeline**:
 
@@ -218,7 +223,7 @@ The system employs a sophisticated **5-stage data preparation pipeline**:
 **Input**: `final_dataset.csv`  
 **Output**: `optimised_final_dataset.csv`
 
-### 📊 Data Flow Diagram
+### Data Flow Diagram
 
 ```
 Student_data.csv (Raw)
@@ -264,7 +269,7 @@ optimised_final_dataset.csv
 
 ## Machine Learning Models
 
-### 1️⃣ **Huber Regression for Score Prediction** (`ML.py`)
+### 1. Huber Regression for Score Prediction (`ML.py`)
 
 #### Purpose
 Robust linear regression model that predicts exam scores based on student characteristics and learning patterns.
@@ -340,7 +345,7 @@ Evaluated using 5-Fold Cross-Validation:
 
 ---
 
-### 2️⃣ **K-Means Clustering for Student Personas** (`clustering.py`)
+### 2. K-Means Clustering for Student Personas (`clustering.py`)
 
 #### Purpose
 Unsupervised clustering to automatically discover and assign 4 distinct student learning personas.
@@ -455,11 +460,11 @@ importance = abs(coefficients)  # Absolute values for impact
 
 ## Frontend Interface
 
-### 🎨 User Interface Architecture
+### User Interface Architecture
 
 Built with **React 18**, **TypeScript**, **Tailwind CSS**, and **Radix UI components**.
 
-### 📄 Main Pages
+### Main Pages
 
 #### **1. Dashboard** (`src/pages/Dashboard.tsx`)
 **Overview**: Central hub for monitoring class performance
@@ -550,7 +555,7 @@ Built with **React 18**, **TypeScript**, **Tailwind CSS**, and **Radix UI compon
 - PDF export functionality
 - Downloadable datasets
 
-### 🔧 UI Components Used
+### UI Components Used
 
 **Radix UI Components** (from `src/components/ui/`):
 - `card.tsx`: Data containers
@@ -564,11 +569,11 @@ Built with **React 18**, **TypeScript**, **Tailwind CSS**, and **Radix UI compon
 - `alert.tsx`, `alert-dialog.tsx`: Notifications
 - And many more...
 
-### 📊 Chart Components (`src/components/dashboard/Charts.tsx`)
+### Chart Components (`src/components/dashboard/Charts.tsx`)
 - **ClusterPieChart**: Distribution of students across personas
 - **FeatureImportanceChart**: Bar chart of predictive features
 
-### 🎯 State Management
+### State Management
 
 **Context API** (`src/contexts/ClassContext.tsx`):
 ```typescript
@@ -587,7 +592,7 @@ const query = useQuery({
 })
 ```
 
-### 🔄 Custom Hooks (`src/hooks/`)
+### Custom Hooks (`src/hooks/`)
 
 - `use-api.ts`: API interaction utilities
 - `use-mobile.ts`: Responsive design detection
@@ -1003,7 +1008,7 @@ Each of the 21 engineered features targets a specific learning dimension:
 - `Score_Gap_Potential`: Improvement opportunity
 - `Log_Hours_Studied`: Non-linear study pattern
 
-### 🤖 Clustering in Context
+### Clustering in Context
 
 K-Means transforms continuous features into discrete personas:
 
@@ -1029,7 +1034,7 @@ low performance
 - Facilitates peer grouping
 - Supports resource allocation
 
-### 📈 Fairness in AI Systems
+### Fairness in AI Systems
 
 The system incorporates fairness checks to prevent algorithmic bias:
 
