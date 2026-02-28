@@ -2,7 +2,7 @@
 
 ## Overview
 
-The **Learning Patterns Dashboard** is an advanced educational analytics platform that combines machine learning, data science, and modern web technologies to provide educators and institutions with deep insights into student learning patterns, performance predictions, and early intervention opportunities.
+The **Student Insight Engine** is an advanced educational analytics platform that combines machine learning, data science, and modern web technologies to provide educators and institutions with deep insights into student learning patterns, performance predictions, and early intervention opportunities.
 
 This system utilizes:
 - **K-Means Clustering** to identify distinct student personas
