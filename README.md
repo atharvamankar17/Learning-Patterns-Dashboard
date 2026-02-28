@@ -1,4 +1,4 @@
-# Learning Patterns Dashboard
+# Student Insight Engine
 
 ## Overview
 
